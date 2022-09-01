@@ -1,0 +1,23 @@
+{
+  "name": "webtech-starter-example",
+  "version": "0.0.1",
+  "description": "Exploring a possible starter environment for webtech projects\"",
+  "main": "index.js",
+  "type": "module",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "author": "Alexander Bazo <alexanderbazo@googlemail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "node-watch": "^0.7.3",
+    "open": "^8.4.0",
+    "sqlite3": "^5.0.8"
+  }
+}
