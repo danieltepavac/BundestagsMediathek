@@ -12,15 +12,15 @@ class DatabaseImporter {
             // await Database.runQuery("CREATE TABLE data");
 
             await Database.runQuery("DROP TABLE Speech");
-            await Database.runQuery("CREATE TABLE Speech( speechId varchar(50) PRIMARY KEY,      date varchar(50),       session varchar(50),        agenda undefined,     speaker undefined,        audio varchar(50))");
+            await Database.runQuery("CREATE TABLE Speech( speechId varchar(50) PRIMARY KEY,      date varchar(50),       session varchar(50),        agenda undefined,      position varchar(50),     speaker undefined,        audio varchar(50))");
             await Database.runQuery("DROP TABLE Agenda");
-            await Database.runQuery("CREATE TABLE Agenda( agendaId integer PRIMARY KEY AUTOINCREMENT,        position varchar(50),       title varchar(50) UNIQUE)");
+            await Database.runQuery("CREATE TABLE Agenda( agendaId integer PRIMARY KEY AUTOINCREMENT,       title varchar(50) UNIQUE)");
             await Database.runQuery("DROP TABLE Speaker");
             await Database.runQuery("CREATE TABLE Speaker( speakerId integer PRIMARY KEY AUTOINCREMENT,        name varchar(50) UNIQUE,       office varchar(50),        party undefined,     description varchar,        image varchar(50))");
             await Database.runQuery("DROP TABLE Party");
             await Database.runQuery("CREATE TABLE Party( partyId integer PRIMARY KEY AUTOINCREMENT,     partyName varchar(50) UNIQUE)");
             await Database.runQuery("DROP TABLE Comments");
-            await Database.runQuery("CREATE TABLE Comments( commentsId integer PRIMARY KEY AUTOINCREMENT)");
+            await Database.runQuery("CREATE TABLE Comments( commentsId integer PRIMARY KEY AUTOINCREMENT,       speechId varchar(50),       comment varchar,        time timestamp)");
             await Database.runQuery("DROP TABLE sqlite_sequence");
             
         } catch (error) {
@@ -43,10 +43,12 @@ class DatabaseImporter {
             let date = speech.date; 
             let session = speech.session; 
             let agenda = agendaId;
-            let speaker = speakerId; 
+            let position = speech.agenda.position;
+            let speaker = speech.speaker; 
             let audio = speech.audio; 
 
-           await Database.runQuery("INSERT INTO Speech (speechID, date, session, agenda, speaker, audio) VALUES ('"+id+"', '"+date+"', '"+session+"', '"+agenda+"', '"+speaker+"', '"+audio+"')"); 
+            await Database.runQuery("INSERT INTO Speech (speechID, date, session, agenda, position, speaker, audio) VALUES ('"+id+"', '"+date+"', '"+session+"', '"+agenda+"', '"+position+"', '"+speaker+"', '"+audio+"')");
+            
         
 
         } catch (error) {
@@ -57,17 +59,13 @@ class DatabaseImporter {
 
 
     async importAgenda(speech) {
-        Logger.log(`Importing speech "${speech.id}" ...`);
+        Logger.log(`Importing agenda "${speech.id}" ...`);
         try {
 
-            let position = speech.agenda.position;
             let title = speech.agenda.title;
 
-            await Database.runQuery("INSERT INTO Agenda (position, title) VALUES ('"+position+"', '"+title+"')");; 
-            
-            let id = await Database.runQuery("SELECT agendaId FROM Agenda WHERE title = '"+speech.agenda.title+"'");
-
-            return id; 
+            await Database.runQuery("INSERT INTO Agenda (title) VALUES ('"+title+"')");; 
+             
             
         } catch (error) {
             console.error(error);
@@ -90,8 +88,6 @@ class DatabaseImporter {
             await Database.runQuery("INSERT INTO Speaker (name, office, party, description, image) VALUES ('"+name+"', '"+office+"', '"+party+"', '"+description+"', '"+image+"')")
             
 
-            //muss ID zurückgeben
-            //select Tabelle Agenda where (sql-Befehl), wenn vorhanden, dann vorhandene ID zurück, wenn nicht, dann importieren
         } catch (error) {
             console.error(error);
             return;
