@@ -29,19 +29,27 @@ class DatabaseImporter {
         }
         return;
     }
-/** 
+
     async importSpeech(speech) {
         Logger.log(`Importing speech "${speech.id}" ...`);
         try {
-            //const agendaID = await importAgenda(speech);
-            //const speakerID = await importSpeaker();
 
-            await Database.runQuery("INSERT INTO Speech (speechID, date, session, agenda, speaker, audio) VALUES ( '$(speech.id)', '$(speech.date)', '$(speech.session)', '$(speech.agenda)', '$(speech.speaker)', '$(speech.audio)')")
+            const agendaId =  await this.importAgenda(speech);
+            console.log(agendaId); 
+
+            //const agendaId = importAgenda(speech);
+            //const speakerID = await importSpeaker();
             
-            
-            // TODO: Speichern Sie den übergebenen Redebeitrag in der vorbereiteten Datenbank
-            // await Database.runQuery("INSERT");
-            // graphisches Tool SQLite arbeiten, da gibts Fehlermeldungen
+            /** 
+            let id = speech.id; 
+            let date = speech.date; 
+            let session = speech.session; 
+            let agenda = await Database.runQuery("SELECT agendaId FROM Agenda"); 
+            let speaker = speech.speaker; 
+            let audio = speech.audio; 
+
+           await Database.runQuery("INSERT INTO Speech (speechID, date, session, agenda, speaker, audio) VALUES ('"+id+"', '"+date+"', '"+session+"', '"+agenda+"', '"+speaker+"', '"+audio+"')"); 
+            */
 
         } catch (error) {
             console.error(error);
@@ -49,15 +57,19 @@ class DatabaseImporter {
         }
     }
 
+
     async importAgenda(speech) {
         Logger.log(`Importing speech "${speech.id}" ...`);
         try {
 
+            let position = speech.agenda.position;
+            let title = speech.agenda.title;
 
-            await Database.runQuery("INSERT INTO Agenda (agendaId, position, title) VALUES ()")
+            await Database.runQuery("INSERT INTO Agenda (position, title) VALUES ('"+position+"', '"+title+"')")
 
-            //muss ID zurückgeben
-            //select Tabelle Agenda where (sql-Befehl), wenn vorhanden, dann vorhandene ID zurück, wenn nicht, dann importieren
+            return await Database.runQuery("SELECT agendaId FROM Agenda LIMIT 1"); 
+         
+            
         } catch (error) {
             console.error(error);
             return;
@@ -96,7 +108,7 @@ class DatabaseImporter {
         }
     }
 
-*/
+
 }
 
 export default new DatabaseImporter();
