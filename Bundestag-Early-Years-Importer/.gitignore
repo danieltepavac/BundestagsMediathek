@@ -1,5 +1,5 @@
 # data files
-data/
+data/*
 
 # database files
 database.sqlite

@@ -4,3 +4,5 @@ package-lock.json
 
 # files from Visual Studio Code
 .vscode
+
+app/data/*
