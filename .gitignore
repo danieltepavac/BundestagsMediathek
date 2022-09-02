@@ -8,3 +8,7 @@ package-lock.json
 .DS_Store
 
 Bundestag-Mediathek-Export-Sample-WP1-1949-1951/*
+
+Bundestag-Early-Years-Importer\data
+Bundestag-Early-Years-Starter\app\data\media
+

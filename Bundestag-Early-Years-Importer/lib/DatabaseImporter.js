@@ -11,11 +11,17 @@ class DatabaseImporter {
             // TODO: Übergeben Sie hier die SQL-Query zum Erstellen des Datenbankschemas
             // await Database.runQuery("CREATE TABLE data");
 
+            await Database.runQuery("DROP TABLE Speech");
             await Database.runQuery("CREATE TABLE Speech( speechId varchar(50) PRIMARY KEY,      date varchar(50),       session varchar(50),        agenda integer,     speaker integer,        audio varchar(50))");
-            await Database.runQuery("CREATE TABLE Agenda( agendaId integer PRIMARY KEY AUTOINCREMENT,        Position varchar(50),       Title varchar(50)");
-            await Database.runQuery("CREATE TABLE Speaker( speakerId integer PRIMARY KEY AUTOINCREMENT,        name varchar(50),       office varchar(50),        party integer,     description varchar,        image varchar(50)");
-            await Database.runQuery("CREATE TABLE Party( partyId integer PRIMARY KEY AUTOINCREMENT,     partyName varchar(50)");
-            await Database.runQuery("CREATE TABLE Comments( commentsId integer PRIMARY KEY AUTOINCREMENT");
+            await Database.runQuery("DROP TABLE Agenda");
+            await Database.runQuery("CREATE TABLE Agenda( agendaId integer PRIMARY KEY AUTOINCREMENT,        Position varchar(50),       Title varchar(50))");
+            await Database.runQuery("DROP TABLE Speaker");
+            await Database.runQuery("CREATE TABLE Speaker( speakerId integer PRIMARY KEY AUTOINCREMENT,        name varchar(50),       office varchar(50),        party integer,     description varchar,        image varchar(50))");
+            await Database.runQuery("DROP TABLE Party");
+            await Database.runQuery("CREATE TABLE Party( partyId integer PRIMARY KEY AUTOINCREMENT,     partyName varchar(50))");
+            await Database.runQuery("DROP TABLE Comments");
+            await Database.runQuery("CREATE TABLE Comments( commentsId integer PRIMARY KEY AUTOINCREMENT)");
+            await Database.runQuery("DROP TABLE sqlite_sequence");
             
         } catch (error) {
             console.error(error);
@@ -23,14 +29,14 @@ class DatabaseImporter {
         }
         return;
     }
-
+/** 
     async importSpeech(speech) {
         Logger.log(`Importing speech "${speech.id}" ...`);
         try {
-            const agendaID = await importAgenda(speech.agenda);
-            const speakerID = await importSpeaker(speech.speaker);
+            //const agendaID = await importAgenda(speech);
+            //const speakerID = await importSpeaker();
 
-            await Database.runQuery("INSERT INTO Speech (speechID, date, session, agenda, speaker, audio) VALUES ()")
+            await Database.runQuery("INSERT INTO Speech (speechID, date, session, agenda, speaker, audio) VALUES ( '$(speech.id)', '$(speech.date)', '$(speech.session)', '$(speech.agenda)', '$(speech.speaker)', '$(speech.audio)')")
             
             
             // TODO: Speichern Sie den übergebenen Redebeitrag in der vorbereiteten Datenbank
@@ -46,10 +52,7 @@ class DatabaseImporter {
     async importAgenda(speech) {
         Logger.log(`Importing speech "${speech.id}" ...`);
         try {
-            // TODO: Speichern Sie den übergebenen Redebeitrag in der vorbereiteten Datenbank
-            // await Database.runQuery("INSERT");
-            // graphisches Tool SQLite arbeiten, da gibts Fehlermeldungen
-            // speech.agenda und speech.speaker separiert importieren
+
 
             await Database.runQuery("INSERT INTO Agenda (agendaId, position, title) VALUES ()")
 
@@ -64,14 +67,10 @@ class DatabaseImporter {
     async importSpeaker(speech) {
         Logger.log(`Importing speech "${speech.id}" ...`);
         try {
-            const speakerID = await importParty(speech.speaker.party);
+            const partyID = await importParty(Database.runQuery("SELECT partyId FROM Party"));
 
-            // TODO: Speichern Sie den übergebenen Redebeitrag in der vorbereiteten Datenbank
-            // await Database.runQuery("INSERT");
-            // graphisches Tool SQLite arbeiten, da gibts Fehlermeldungen
-            // speech.agenda und speech.speaker separiert importieren
-
-            await Database.runQuery("INSERT INTO Speaker (speakerId, name, office, party, description, image) VALUES ()")
+            await Database.runQuery("INSERT INTO Speaker (speakerId, name, office, party, description, image) VALUES (speakerId, '${speech.speaker.name}', '${speech.speaker.office}', partyId, '${speech.speaker.description}', '${speech.speaker.image}')")
+            await Database.runQuery("SELECT speakerId From Speaker");
 
             //muss ID zurückgeben
             //select Tabelle Agenda where (sql-Befehl), wenn vorhanden, dann vorhandene ID zurück, wenn nicht, dann importieren
@@ -84,12 +83,10 @@ class DatabaseImporter {
     async importParty(speech) {
         Logger.log(`Importing speech "${speech.id}" ...`);
         try {
-            // TODO: Speichern Sie den übergebenen Redebeitrag in der vorbereiteten Datenbank
-            // await Database.runQuery("INSERT");
-            // graphisches Tool SQLite arbeiten, da gibts Fehlermeldungen
-            // speech.agenda und speech.speaker separiert importieren
 
-            await Database.runQuery("INSERT INTO Party (partyId, name) VALUES ()")
+            //var partyId = SQL-Befehl eine ID speichert? 
+            await Database.runQuery("INSERT INTO Party (partyId, name) VALUES (partyId, '${speech.speaker.party}')")
+            var partyId = await Database.runQuery("SELECT partyId FROM Party");
 
             //muss ID zurückgeben
             //select Tabelle Agenda where (sql-Befehl), wenn vorhanden, dann vorhandene ID zurück, wenn nicht, dann importieren
@@ -99,7 +96,7 @@ class DatabaseImporter {
         }
     }
 
-
+*/
 }
 
 export default new DatabaseImporter();
