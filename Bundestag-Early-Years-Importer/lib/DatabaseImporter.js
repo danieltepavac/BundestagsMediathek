@@ -22,7 +22,7 @@ class DatabaseImporter {
             await Database.runQuery("DROP TABLE Comments");
             await Database.runQuery("CREATE TABLE Comments( commentsId integer PRIMARY KEY AUTOINCREMENT)");
             await Database.runQuery("DROP TABLE sqlite_sequence");
-            
+            //test
         } catch (error) {
             console.error(error);
             return;
