@@ -12,16 +12,15 @@ class DatabaseImporter {
             // await Database.runQuery("CREATE TABLE data");
 
             await Database.runQuery("DROP TABLE Speech");
-            await Database.runQuery("CREATE TABLE Speech( speechId varchar(50) PRIMARY KEY,      date varchar(50),       session varchar(50),        agenda undefined,      position varchar(50),     speaker undefined,        audio varchar(50))");
+            await Database.runQuery("CREATE TABLE Speech( speechId varchar(50) PRIMARY KEY,      date varchar(50),       session varchar(50),        agendaId integer,     speaker undefined,        audio varchar(50))");
             await Database.runQuery("DROP TABLE Agenda");
-            await Database.runQuery("CREATE TABLE Agenda( agendaId integer PRIMARY KEY AUTOINCREMENT,       title varchar(50) UNIQUE)");
+            await Database.runQuery("CREATE TABLE Agenda( agendaId integer PRIMARY KEY AUTOINCREMENT,       position varchar(50),       title varchar(50) UNIQUE)");
             await Database.runQuery("DROP TABLE Speaker");
             await Database.runQuery("CREATE TABLE Speaker( speakerId integer PRIMARY KEY AUTOINCREMENT,        name varchar(50) UNIQUE,       office varchar(50),        party undefined,     description varchar,        image varchar(50))");
             await Database.runQuery("DROP TABLE Party");
             await Database.runQuery("CREATE TABLE Party( partyId integer PRIMARY KEY AUTOINCREMENT,     partyName varchar(50) UNIQUE)");
             await Database.runQuery("DROP TABLE Comments");
             await Database.runQuery("CREATE TABLE Comments( commentsId integer PRIMARY KEY AUTOINCREMENT,       speechId varchar(50),       comment varchar,        time timestamp)");
-            await Database.runQuery("DROP TABLE sqlite_sequence");
             
         } catch (error) {
             console.error(error);
@@ -29,27 +28,29 @@ class DatabaseImporter {
         }
         return;
     }
-
+ 
     async importSpeech(speech) {
         Logger.log(`Importing speech "${speech.id}" ...`);
         try {
 
-            const agendaId = await this.importAgenda(speech);
-            const speakerId = await this.importSpeaker(speech);
-            
+            const agendaDb = await this.importAgenda(speech);
+            const speakerDb = await this.importSpeaker(speech);
             
             
             let id = speech.id; 
             let date = speech.date; 
             let session = speech.session; 
-            let agenda = agendaId;
-            let position = speech.agenda.position;
+            let agenda = 2; 
             let speaker = speech.speaker; 
             let audio = speech.audio; 
 
-            await Database.runQuery("INSERT INTO Speech (speechID, date, session, agenda, position, speaker, audio) VALUES ('"+id+"', '"+date+"', '"+session+"', '"+agenda+"', '"+position+"', '"+speaker+"', '"+audio+"')");
+
+
+            await Database.runQuery("INSERT INTO Speech (speechId, date, session, speaker, audio) VALUES ('"+id+"', '"+date+"', '"+session+"', '"+speaker+"', '"+audio+"')");
             
+            await Database.runQuery("ALTER TABLE Speech ADD CONSTRAINT FK_agendaId FOREIGN KEY (agendaId) REFERENCES Agenda(agendaId)");
         
+
 
         } catch (error) {
             console.error(error);
@@ -63,8 +64,9 @@ class DatabaseImporter {
         try {
 
             let title = speech.agenda.title;
+            let position = speech.agenda.position;
 
-            await Database.runQuery("INSERT INTO Agenda (title) VALUES ('"+title+"')");; 
+            await Database.runQuery("INSERT INTO Agenda (position, title) VALUES ('"+position+"', '"+title+"')");; 
              
             
         } catch (error) {
@@ -85,7 +87,7 @@ class DatabaseImporter {
             let description = speech.speaker.description;
             let image = speech.speaker.image; 
 
-            await Database.runQuery("INSERT INTO Speaker (name, office, party, description, image) VALUES ('"+name+"', '"+office+"', '"+party+"', '"+description+"', '"+image+"')")
+            await Database.runQuery("INSERT INTO Speaker (name, office, party, description, image) VALUES ('"+name+"', '"+office+"', '"+party+"', '"+description+"', '"+image+"')");
             
 
         } catch (error) {
