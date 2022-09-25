@@ -22,8 +22,11 @@ async function initDB(){
     response = await db.runQuery(query);
     console.log(`Result for "${query}"`); // eslint-disable-line no-console
     console.log(response.resultSet); // eslint-disable-line no-console
+/** 
+    query = "SELECT title FROM agenda";
+    response = await db.runQuery(query);
+    console.log(`Result for "${query}"`);
+    console.log(response.resultSet);*/
 }
-
-
 
 init();
