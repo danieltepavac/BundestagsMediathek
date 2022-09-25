@@ -9,13 +9,57 @@ function init() {
     speechId = urlParams.get('speechId');
     console.log(speechId);
     loadSpeechDetails(speechId);
+    loadAudioFile();
 }
 
-function loadSpeechDetails(speechId){
+async function loadSpeechDetails(speechId){
+    let query, response, db, detailHTML = "";
 
-    console.log("ust copy and paste from overview and use ....");
-    console.log(speechId);
-    // sql select details zur speech
+    db = new RemoteSQLiteDatabase();
+    db.connect();
+
+    query = `SELECT * FROM Speech AS s
+                LEFT JOIN Speaker AS p
+                ON s.speaker = p.name`;
+    response = await db.runQuery(query);
+    response.resultSet.forEach(speech => {
+        console.log("");
+        console.log("single speech");
+        console.log(speechId);
+        
+        detailHTML +=`    
+        <div class="speakerinfo"> 
+        <p class="Name">${speechId.name}</p><br>
+        <p class="Parteizugehörigkeit">${speech.speechId.speaker}</p><br>
+        </div>
+        `;
+    });
+    document.getElementsByClassName("speakerinfo").innerHTML = detailHTML;
+    loadAudioFile();
+}
+
+async function loadAudioFile() {
+    let query, response, db, audioHTML="";
+
+    db = new RemoteSQLiteDatabase();
+    db.connect();
+
+    query = `SELECT audio FROM Speech`;
+    response = await db.runQuery(query);
+    console.log("**************");
+    console.log(response);
+
+    response.resultSet.forEach(speech => {
+        console.log("");
+        console.log(speech.audio);
+        
+        audioHTML +=`   
+        <audio controls>
+        <source src="${speech.audio}"> 
+        </audio>
+        `;
+    });
+    document.querySelector("audio").innerHTML = audioHTML;
 }
 
 init();
