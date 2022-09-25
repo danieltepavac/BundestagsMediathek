@@ -10,17 +10,21 @@ class DatabaseImporter {
             await Database.open();
             // TODO: Übergeben Sie hier die SQL-Query zum Erstellen des Datenbankschemas
             // await Database.runQuery("CREATE TABLE data");
-
-            await Database.runQuery("DROP TABLE Speech");
-            await Database.runQuery("CREATE TABLE Speech( speechId varchar(50) PRIMARY KEY,      date varchar(50),       session varchar(50),        agendaId integer,     speaker undefined,        audio varchar(50))");
+            
+            
             await Database.runQuery("DROP TABLE Agenda");
-            await Database.runQuery("CREATE TABLE Agenda( agendaId integer PRIMARY KEY AUTOINCREMENT,       position varchar(50),       title varchar(50) UNIQUE)");
+            await Database.runQuery("CREATE TABLE Agenda( agendaId INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,       position varchar(50),       title varchar(50) UNIQUE)");
             await Database.runQuery("DROP TABLE Speaker");
-            await Database.runQuery("CREATE TABLE Speaker( speakerId integer PRIMARY KEY AUTOINCREMENT,        name varchar(50) UNIQUE,       office varchar(50),        party undefined,     description varchar,        image varchar(50))");
+            await Database.runQuery("CREATE TABLE Speaker( speakerId INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,        name varchar(50),       office varchar(50),        partyId INTEGER,     description varchar,        image varchar(50), FOREIGN KEY (partyId) REFERENCES Party(partyId))");
             await Database.runQuery("DROP TABLE Party");
-            await Database.runQuery("CREATE TABLE Party( partyId integer PRIMARY KEY AUTOINCREMENT,     partyName varchar(50) UNIQUE)");
+            await Database.runQuery("CREATE TABLE Party( partyId integer NOT NULL PRIMARY KEY AUTOINCREMENT,     partyName varchar(50) UNIQUE)");
+            await Database.runQuery("DROP TABLE Speech");
+            await Database.runQuery("CREATE TABLE Speech( speechId varchar(50) PRIMARY KEY,      date varchar(50),       session varchar(50),        agendaId INTEGER,     speakerId INTEGER,        audio varchar(50), FOREIGN KEY(agendaId) REFERENCES Agenda(agendaId), FOREIGN KEY(speakerId) REFERENCES Speaker(speakerId))");
             await Database.runQuery("DROP TABLE Comments");
             await Database.runQuery("CREATE TABLE Comments( commentsId integer PRIMARY KEY AUTOINCREMENT,       speechId varchar(50),       comment varchar,        time timestamp)");
+             
+            // let result = await Database.runQuery("SELECT...")
+            // if(result.rows.length > 0) {}
             
         } catch (error) {
             console.error(error);
@@ -28,28 +32,34 @@ class DatabaseImporter {
         }
         return;
     }
- 
+
+     
+    
     async importSpeech(speech) {
         Logger.log(`Importing speech "${speech.id}" ...`);
         try {
 
-            const agendaDb = await this.importAgenda(speech);
-            const speakerDb = await this.importSpeaker(speech);
             
+           await this.importAgenda(speech);
+           await this.importSpeaker(speech);
+            
+            let speechTitle = speech.agenda.title;
+            let speechSpeaker = speech.speaker.name;
             
             let id = speech.id; 
             let date = speech.date; 
             let session = speech.session; 
-            let agenda = 2; 
-            let speaker = speech.speaker; 
             let audio = speech.audio; 
 
+            let objectAgendaId = await Database.runQuery("SELECT agendaId FROM Agenda WHERE title = '"+speechTitle+"'");
+            let currentAgendaId = objectAgendaId.resultSet[0].agendaId;
 
+            let objectSpeakerId = await Database.runQuery("SELECT speakerId FROM Speaker WHERE name = '"+speechSpeaker+"'");
+            let currentSpeakerId = objectSpeakerId.resultSet[0].speakerId;
 
-            await Database.runQuery("INSERT INTO Speech (speechId, date, session, speaker, audio) VALUES ('"+id+"', '"+date+"', '"+session+"', '"+speaker+"', '"+audio+"')");
             
-            await Database.runQuery("ALTER TABLE Speech ADD CONSTRAINT FK_agendaId FOREIGN KEY (agendaId) REFERENCES Agenda(agendaId)");
-        
+            
+            await Database.runQuery("INSERT INTO Speech (speechId, date, session, agendaId, speakerId, audio) VALUES ('"+id+"', '"+date+"', '"+session+"','"+currentAgendaId+"','"+currentSpeakerId+"', '"+audio+"')");
 
 
         } catch (error) {
@@ -58,7 +68,7 @@ class DatabaseImporter {
         }
     }
 
-
+ 
     async importAgenda(speech) {
         Logger.log(`Importing agenda "${speech.id}" ...`);
         try {
@@ -66,7 +76,7 @@ class DatabaseImporter {
             let title = speech.agenda.title;
             let position = speech.agenda.position;
 
-            await Database.runQuery("INSERT INTO Agenda (position, title) VALUES ('"+position+"', '"+title+"')");; 
+            await Database.runQuery("INSERT OR IGNORE INTO Agenda (position, title) VALUES ('"+position+"', '"+title+"')");
              
             
         } catch (error) {
@@ -79,16 +89,22 @@ class DatabaseImporter {
         Logger.log(`Importing speech "${speech.id}" ...`);
         try {
 
-            const partyId = await this.importParty(speech);
+            let speechParty = speech.speaker.party
+
+            await this.importParty(speech);
+
 
             let name = speech.speaker.name;
             let office = speech.speaker.office;
-            let party = partyId; 
             let description = speech.speaker.description;
             let image = speech.speaker.image; 
 
-            await Database.runQuery("INSERT INTO Speaker (name, office, party, description, image) VALUES ('"+name+"', '"+office+"', '"+party+"', '"+description+"', '"+image+"')");
             
+            let objectPartyId = await Database.runQuery("SELECT partyId From Party WHERE partyName = '"+speechParty+"'");
+            let currentPartyId = (objectPartyId.resultSet[0].partyId);
+
+            await Database.runQuery("INSERT OR IGNORE INTO Speaker (name, office, partyId, description, image) VALUES ('"+name+"', '"+office+"', '"+currentPartyId+"', '"+description+"', '"+image+"')");
+
 
         } catch (error) {
             console.error(error);
@@ -100,9 +116,11 @@ class DatabaseImporter {
         Logger.log(`Importing speech "${speech.id}" ...`);
         try {
 
+            
             let partyName = speech.speaker.party
 
-            await Database.runQuery("INSERT INTO Party (partyName) VALUES ('"+partyName+"')");
+            await Database.runQuery("INSERT OR IGNORE INTO Party (partyName) VALUES ('"+partyName+"')");
+
             
         } catch (error) {
             console.error(error);
