@@ -36,6 +36,11 @@ p.introduction {
     background: #fff;
     box-shadow: 0 6px 10px rgba(0, 0, 0, .08), 0 0 6px rgba(0, 0, 0, .05);
     line-height: 150%;
+    font-size: large;
+}
+
+.overview {
+    font-size: large;
 }
 
 .search-funtion {
@@ -49,11 +54,11 @@ input {
 }   
 
 #button {
-    width: 10rem;
+    width: 12rem;
     border: 1px solid;
     padding: 10px;
     box-shadow: 5px 10px 18px #888888;
-    position:
+    font-size: large;
 }
 
 .speakerinfo {
@@ -65,19 +70,15 @@ input {
 
 #overview-speeches-list {
     display: grid;
-    grid-template-columns: auto auto auto auto;
-    padding: 10px;
-    text-align: center;
+    grid-template-columns: repeat(4, minmax(0, 2fr));
 }
 
 .overview-speech-entry {
-    border: 3px solid black;
+    border: 2px solid black;
     border-radius: 25px;
-    padding: 5px;
+    padding: 1em;
     margin: 2vh;
-    background-color:aliceblue;
-
-    /* TODO Ecken Abrunden */
+    background-color: whitesmoke;
 }
 
 #menu {

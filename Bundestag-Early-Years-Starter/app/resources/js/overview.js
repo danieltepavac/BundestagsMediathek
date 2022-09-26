@@ -7,15 +7,14 @@ function init() {
     
       initDB();
       showSpeechesOverview();
-      myFunction();
 
-      document.getElementById ("searchButton").addEventListener ("click", search);
+      document.getElementById("searchButton").addEventListener("click", search);
       
 }
 
 async function initDB(){
 
-    let query, response, db;
+    let db;
 
     // Create remote database connection
     db = new RemoteSQLiteDatabase();
@@ -40,7 +39,7 @@ async function showSpeechesOverview(filterQuery = null){
     }
     
     response = await db.runQuery(query);
-    console.log("######################");
+    console.log("######################"); //braucht man nicht unbedingt
     console.log(response);
     response.resultSet.forEach(speech => {
         console.log("");
@@ -50,34 +49,16 @@ async function showSpeechesOverview(filterQuery = null){
          year = date.getFullYear();
         speechesHtml +=`    
         <div class="overview-speech-entry">
-            <p class="id">${speech.speechId}</p>
             <p class="titel">${speech.title}</p>
             <p class="speaker">${speech.speaker}</p>
             <p class="year">${year}</p>
-            <a href="detail.html?speechId=${speech.speechId}">Zur Detailansicht</a>
+            <a href="detail.html?speechId=${speech.speechId}">Mehr Infos</a>
         </div>
     `;
     });
     document.getElementById("overview-speeches-list").innerHTML = speechesHtml;
 }
-/** die Funktion zum Filtern brauchen wir wahrscheinlich doch nicht
-async function myFunction() {
-    var input, filter, list, entry, a, i, txtValue;
-    input = document.getElementById("myInput");
-    filter = input.value.toUpperCase();
-    list = document.getElementById("overview-speeches-list");
-    entry = document.getElementsByClassName("overview-speech-entry");
-    for (i = 0; i < list.length; i++) {
-        a = list[i].getElementsByTagName("a")[0];
-        txtValue = a.textContent || a.innerText;
-        if (txtValue.toUpperCase().indexOf(filter) > -1) {
-            list[i].style.display = "";
-        } else {
-            list[i].style.display = "none";
-        }
-    }
-}
-*/
+
 function search() {
     const filterQuery = document.getElementById("searchInput").value;
     showSpeechesOverview(filterQuery);    

@@ -85,19 +85,5 @@ async function accessDataAgenda(){
     let text = "Die Redebeiträge diskutieren " +response.resultSet.length+ " verschiedenen Themen, beziehungsweise Sitzungspunkte.";
     document.getElementById("number-agendas").innerHTML = text;
 }
-/* Zeitraum angeben?
-async function accessDataTime(){
-
-    let query, response, db;
-    
-    db = new RemoteSQLiteDatabase();
-    db.connect();
-
-    query = "SELECT FIRST (speechId) AS first_speech FROM Speech";
-    response = await db.runQuery(query);
-    console.log(response.resultSet);
-    let text = "Insgesamt sind Reden von Politiker*innen aus " +response.resultSet+ " verschiedenen Parteien vertreten.";
-    document.getElementById("first-speech").innerHTML = text;
-}*/
 init();
 

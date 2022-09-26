@@ -9,7 +9,6 @@ function init() {
     speechId = urlParams.get('speechId');
     console.log(speechId);
     loadSpeechDetails(speechId);
-    loadAudioFile();
 }
 
 async function loadSpeechDetails(speechId){
@@ -29,7 +28,7 @@ async function loadSpeechDetails(speechId){
         
         detailHTML +=`    
         <div class="speakerinfo"> 
-        <p class="Name">${speechId.name}</p><br>
+        <p class="Name">${speechId}</p><br>
         <p class="Parteizugehörigkeit">${speech.speechId.speaker}</p><br>
         </div>
         `;
@@ -37,7 +36,7 @@ async function loadSpeechDetails(speechId){
     document.getElementsByClassName("speakerinfo").innerHTML = detailHTML;
     loadAudioFile();
 }
-
+//momentan greift die Funktion nur auf den Namen "audioId" zu; es muss der Pfad zum media Ordner mit der Id verbunden werden
 async function loadAudioFile() {
     let query, response, db, audioHTML="";
 
@@ -55,7 +54,7 @@ async function loadAudioFile() {
         
         audioHTML +=`   
         <audio controls>
-        <source src="${speech.audio}"> 
+        <source src="&#92;Bundestag-Early-Years-Starter&#92;app&#92;data&#92;media + ${speech.audio}"> 
         </audio>
         `;
     });
